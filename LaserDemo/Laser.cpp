@@ -70,70 +70,92 @@ void Laser::init()
   
 /***************** DAC *************************/
   Serial.println("...init");
-  pinMode (SS_PIN, OUTPUT);
-  pinMode (LDAC_PIN, OUTPUT);
 
-  digitalWrite (SS_PIN, HIGH);
-//  digitalWrite (LDAC_PIN, HIGH);
-  digitalWrite (LDAC_PIN, LOW);
+//Setup R/2R DAC for X coordinate
+    dac_output_enable(DAC_X);
+
+    //Setup R/2R DAC for Y Coordinate
+    dac_output_enable(DAC_Y);
+
+    setX(0);
+    setY(0);
+
 
   SPI.begin();
   SPI.beginTransaction (SPISettings (4000000, MSBFIRST, SPI_MODE0));
 /***********************************************/
 
-//  dac.init(MCP4X_4822, 5000, 5000,
-//      10, 7, 1);
-//  dac.setGain2x(MCP4X_CHAN_A, 0);
-//  dac.setGain2x(MCP4X_CHAN_B, 0);
-//  dac.begin(1);
  
   pinMode(_laserPin, OUTPUT);
 
   Serial.println("done init");
 }
 
-void Laser::sendToDAC(int x, int y)
+void Laser::setX(int x)
 {
-  Serial.println("sendtoDAC");
-  #ifdef LASER_SWAP_XY
-  int x1 = y;
-  int y1 = x;
-  #else
-  int x1 = x;
-  int y1 = y;
-  #endif
-  #ifdef LASER_FLIP_X
-  x1 = 4095 - x1;
-  #endif
-  #ifdef LASER_FLIP_Y
-  y1 = 4095 - y1;
-  #endif
-
-//  dac.output2(x1, y1);
-
-  laserPoints++;
-
-  scanner_throttle();
-
-  x1 &= 0xfff;
-  digitalWrite (SS_PIN, LOW);
-  SPI.transfer((x1 >> 8) | commandBits1);
-  SPI.transfer((x1 & 0xff));
-  digitalWrite (SS_PIN, HIGH);
-
-  y1 &= 0xfff;
-  digitalWrite (SS_PIN, LOW);
-  SPI.transfer((y1 >> 8) | commandBits2);
-  SPI.transfer((y1 & 0xff));
-  digitalWrite (SS_PIN, HIGH);
-
-  // latch
-  digitalWrite (LDAC_PIN, LOW);
-  digitalWrite (LDAC_PIN, HIGH);
-
-//  wait(laser_throttle);
-  
+    //DAC_CHANNEL_1 is GPIO 25
+    int status = dac_output_voltage(DAC_X, x);
+    if (status == ESP_ERR_INVALID_ARG)
+    {
+        Serial.print("Error setting X axis to ");
+        Serial.println(x);
+    }
 }
+
+void Laser::setY(int y)
+{
+    //DAC_CHANNEL_2 is GPIO 26
+    int status = dac_output_voltage(DAC_Y, y);
+    if (status == ESP_ERR_INVALID_ARG)
+    {
+        Serial.print("Error setting Y axis to ");
+        Serial.println(y);
+    }
+    laserPoints++;
+}
+
+// void Laser::sendToDAC(int x, int y)
+// {
+//   Serial.println("sendtoDAC");
+//   #ifdef LASER_SWAP_XY
+//   int x1 = y;
+//   int y1 = x;
+//   #else
+//   int x1 = x;
+//   int y1 = y;
+//   #endif
+//   #ifdef LASER_FLIP_X
+//   x1 = 4095 - x1;
+//   #endif
+//   #ifdef LASER_FLIP_Y
+//   y1 = 4095 - y1;
+//   #endif
+
+// //  dac.output2(x1, y1);
+
+//   laserPoints++;
+
+//   scanner_throttle();
+
+//   x1 &= 0xfff;
+//   digitalWrite (SS_PIN, LOW);
+//   SPI.transfer((x1 >> 8) | commandBits1);
+//   SPI.transfer((x1 & 0xff));
+//   digitalWrite (SS_PIN, HIGH);
+
+//   y1 &= 0xfff;
+//   digitalWrite (SS_PIN, LOW);
+//   SPI.transfer((y1 >> 8) | commandBits2);
+//   SPI.transfer((y1 & 0xff));
+//   digitalWrite (SS_PIN, HIGH);
+
+//   // latch
+//   digitalWrite (LDAC_PIN, LOW);
+//   digitalWrite (LDAC_PIN, HIGH);
+
+// //  wait(laser_throttle);
+  
+// }
 
 void Laser::resetClipArea()
 {
@@ -313,7 +335,12 @@ void Laser::sendtoRaw (long xNew, long yNew)
     tmpy += fdiffy;
   Serial.print("str...2 ");
   Serial.println (_x + TO_INT(tmpx));
-    sendToDAC(_x + TO_INT(tmpx), _y + TO_INT(tmpy));
+
+  // sendToDAC(_x + TO_INT(tmpx), _y + TO_INT(tmpy));
+
+  setX(_x + TO_INT(tmpx));
+  setY(_y + TO_INT(tmpy));
+
     #ifdef LASER_MOVE_DELAY
     wait(LASER_MOVE_DELAY);
     #endif
@@ -332,7 +359,11 @@ void Laser::sendtoRaw (long xNew, long yNew)
   _y = yNew;
     Serial.print("str...3 ");
     Serial.println (_x);
-  sendToDAC(_x, _y);
+
+  setX(_x);
+  setY(_y);
+  // sendToDAC(_x, _y);
+
 //  wait(LASER_END_DELAY);
 }
 

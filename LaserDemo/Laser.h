@@ -8,10 +8,8 @@
 
 /****************************** 2 Single DACs ***************************/
 #include <SPI.h>
-
+#include <driver/dac.h>
 // laser TTL on pin 4
-#define LDAC_PIN 5
-#define SS_PIN 15
 
 #define MOSI  13    //MOSI
 #define MISO  12    //MISO
@@ -113,10 +111,17 @@ public:
   void getOptions(int &kpps, int &ltd, int &lq) { kpps = SCANNER_KPPS; ltd = LASER_TOGGLE_DELAY; lq = LASER_QUALITY; }
   
   //! send X/Y to DAC
-  void sendToDAC(int x, int y);
+  // void sendToDAC(int x, int y);
 
 private:
 
+  //DAC Pins
+  const dac_channel_t DAC_X = DAC_CHANNEL_1; //Pin 25 by default for ESP32
+  const dac_channel_t DAC_Y = DAC_CHANNEL_2; //Pin 26 by default for ESP32
+
+  void setX(int x);
+  void setY(int y);
+  
   int ttlNow = 0;
   int ttlThen = 0;
   int ttlQueue[16];
@@ -127,8 +132,6 @@ private:
   int SCANNER_KPPS = 20;
   int LASER_TOGGLE_DELAY = 120;
   int LASER_QUALITY = 400;
-
-
 
 //! send X/Y to DAC
 ////  void sendToDAC(int x, int y);
