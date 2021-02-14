@@ -109,9 +109,6 @@ public:
 
   void setOptions(int kpps, int ltd, int lq);
   void getOptions(int &kpps, int &ltd, int &lq) { kpps = SCANNER_KPPS; ltd = LASER_TOGGLE_DELAY; lq = LASER_QUALITY; }
-  
-  //! send X/Y to DAC
-  // void sendToDAC(int x, int y);
 
 private:
 
@@ -132,9 +129,6 @@ private:
   int SCANNER_KPPS = 20;
   int LASER_TOGGLE_DELAY = 120;
   int LASER_QUALITY = 400;
-
-//! send X/Y to DAC
-////  void sendToDAC(int x, int y);
 
   //! computes the out code for line clipping
   int computeOutCode(long x, long y);

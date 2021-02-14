@@ -1,26 +1,7 @@
-// See LICENSE file for details
-// Copyright 2016 Florian Link (at) gmx.de
 #include "Laser.h"
 
-// these values can be adapted to fine tune sendto:
-
-// if this is enabled, pins need to be 10 and 7 in dac init below, but it is a big speedup!
-#define MCP4X_PORT_WRITE 1
-
-/*
- * doing it manually, since two single DACs didn't work with library.
- * ...and there was the PORTx stuff...
-#include "DAC_MCP4X.h"
-MCP4X dac;
-*/
 
 int laserPoints = 0;
-
-//void laserToggleOn();
-//void laserToggleOff();
-
-//int ttlPin;
-
 
 Laser::Laser(int laserPin)
 {
@@ -55,23 +36,10 @@ Laser::Laser(int laserPin)
 void Laser::init()
 {
 
-/*
-  // laser toggle timer
-  timer2_isr_init();
-  timer2_attachInterrupt(laserToggleOff);
-  timer2_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-
-  timer1_isr_init();
-  timer1_attachInterrupt(laserToggleOn);
-  timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-
-  ttlPin = _laserPin;
-  */
-  
 /***************** DAC *************************/
   Serial.println("...init");
 
-//Setup R/2R DAC for X coordinate
+  //Setup R/2R DAC for X coordinate
     dac_output_enable(DAC_X);
 
     //Setup R/2R DAC for Y Coordinate
@@ -80,14 +48,8 @@ void Laser::init()
     setX(0);
     setY(0);
 
-
-  SPI.begin();
-  SPI.beginTransaction (SPISettings (4000000, MSBFIRST, SPI_MODE0));
 /***********************************************/
-
- 
   pinMode(_laserPin, OUTPUT);
-
   Serial.println("done init");
 }
 
@@ -113,49 +75,6 @@ void Laser::setY(int y)
     }
     laserPoints++;
 }
-
-// void Laser::sendToDAC(int x, int y)
-// {
-//   Serial.println("sendtoDAC");
-//   #ifdef LASER_SWAP_XY
-//   int x1 = y;
-//   int y1 = x;
-//   #else
-//   int x1 = x;
-//   int y1 = y;
-//   #endif
-//   #ifdef LASER_FLIP_X
-//   x1 = 4095 - x1;
-//   #endif
-//   #ifdef LASER_FLIP_Y
-//   y1 = 4095 - y1;
-//   #endif
-
-// //  dac.output2(x1, y1);
-
-//   laserPoints++;
-
-//   scanner_throttle();
-
-//   x1 &= 0xfff;
-//   digitalWrite (SS_PIN, LOW);
-//   SPI.transfer((x1 >> 8) | commandBits1);
-//   SPI.transfer((x1 & 0xff));
-//   digitalWrite (SS_PIN, HIGH);
-
-//   y1 &= 0xfff;
-//   digitalWrite (SS_PIN, LOW);
-//   SPI.transfer((y1 >> 8) | commandBits2);
-//   SPI.transfer((y1 & 0xff));
-//   digitalWrite (SS_PIN, HIGH);
-
-//   // latch
-//   digitalWrite (LDAC_PIN, LOW);
-//   digitalWrite (LDAC_PIN, HIGH);
-
-// //  wait(laser_throttle);
-  
-// }
 
 void Laser::resetClipArea()
 {
@@ -336,8 +255,6 @@ void Laser::sendtoRaw (long xNew, long yNew)
   Serial.print("str...2 ");
   Serial.println (_x + TO_INT(tmpx));
 
-  // sendToDAC(_x + TO_INT(tmpx), _y + TO_INT(tmpy));
-
   setX(_x + TO_INT(tmpx));
   setY(_y + TO_INT(tmpy));
 
@@ -362,7 +279,6 @@ void Laser::sendtoRaw (long xNew, long yNew)
 
   setX(_x);
   setY(_y);
-  // sendToDAC(_x, _y);
 
 //  wait(LASER_END_DELAY);
 }
@@ -424,51 +340,6 @@ void Laser::scanner_throttle() {
 
 }
 
-/*
-void Laser::scanner_throttle() {
-
-  int ttlAction;
-  int ttlThen;
-  unsigned int tempTime;
-  
-  char temp[200];
-
-  ttlThen = (ttlNow 
-            - ttlCourse
-            + 16) & 0xf;
-
-  ttlAction = ttlQueue[ttlThen];
-
-  do {
-    tempTime = micros();
-    if (ttlAction >= 0  && _last_scan + ttlFine <= tempTime) {
-      digitalWrite(_laserPin, ttlAction);
-      ttlAction = -1;
-    } 
-    yield(); 
-  } while (_last_scan + (1000/SCANNER_KPPS) > tempTime);
-
-  ttlNow = ++ttlNow & 0xf;
-  ttlQueue[ttlNow] = -1;
-  
-  _last_scan = micros();
-
-}
-*/
-/*
-void Laser::scanner_throttle() {
-  while (_last_scan + (1000/SCANNER_KPPS) > micros());
-  _last_scan = micros();
-
-  ttlThen = (ttlNow - (LASER_TOGGLE_DELAY * SCANNER_KPPS / 1000) + 16) & 0xf;
-  if (ttlQueue[ttlThen] >= 0) {
-    digitalWrite(_laserPin, ttlQueue[ttlThen]);
-    yield();
-  }
-  ttlNow = ++ttlNow & 0xf;
-  ttlQueue[ttlNow] = -1;
-}
-*/
 void Laser::setOptions(int kpps, int ltd, int lq) {
 
   if ( kpps ) { SCANNER_KPPS = kpps; }
@@ -497,13 +368,3 @@ void Laser::setOffset(long offsetX, long offsetY)
   _offsetX = offsetX;
   _offsetY = offsetY;
 }
-
-/*
-void laserToggleOn() {
-    digitalWrite(ttlPin,HIGH);
-}
-
-void laserToggleOff() {
-  digitalWrite(ttlPin,LOW);  
-}
-*/

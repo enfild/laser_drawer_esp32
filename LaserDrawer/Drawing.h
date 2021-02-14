@@ -1,5 +1,3 @@
-// See LICENSE file for details
-// Copyright 2016 Florian Link (at) gmx.de
 #ifndef DRAWING_H
 #define DRAWING_H
 
