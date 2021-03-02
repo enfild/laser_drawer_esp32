@@ -19,17 +19,17 @@ const unsigned int lut[] = {         // 0 to 90 degrees fixed point COSINE look 
 long SIN(unsigned int angle) {
   angle += 90;
   if (angle > 450) return LUT(0);
-  if (angle > 360 && angle < 451) return -LUT(angle-360);
-  if (angle > 270 && angle < 361) return -LUT(360-angle);
-  if (angle > 180 && angle < 271) return  LUT(angle-180);
-  return LUT(180-angle);
+  if (angle > 360 && angle < 451) return -LUT(angle - 360);
+  if (angle > 270 && angle < 361) return -LUT(360 - angle);
+  if (angle > 180 && angle < 271) return  LUT(angle - 180);
+  return LUT(180 - angle);
 }
 
 long COS(unsigned int angle) {
   if (angle > 360) return LUT(0);
-  if (angle > 270 && angle < 361) return  LUT(360-angle);
-  if (angle > 180 && angle < 271) return -LUT(angle-180);
-  if (angle > 90  && angle < 181) return -LUT(180-angle);
+  if (angle > 270 && angle < 361) return  LUT(360 - angle);
+  if (angle > 180 && angle < 271) return -LUT(angle - 180);
+  if (angle > 90  && angle < 181) return -LUT(180 - angle);
   return LUT(angle);
 }
 
@@ -42,9 +42,9 @@ static long pMultiply(long x, long y) {
 // Matrix operation
 // ----------------------------------------------
 void Matrix3::multiply(const Matrix3 &mat1, const Matrix3 &mat2, Matrix3& mat ) {
-  unsigned char r,c;
-  for (c=0; c<3; c++)
-    for (r=0; r<3; r++)
+  unsigned char r, c;
+  for (c = 0; c < 3; c++)
+    for (r = 0; r < 3; r++)
       mat.m[c][r] = pMultiply(mat1.m[0][r], mat2.m[c][0]) +
                     pMultiply(mat1.m[1][r], mat2.m[c][1]) +
                     pMultiply(mat1.m[2][r], mat2.m[c][2]);
@@ -79,17 +79,16 @@ Matrix3 Matrix3::rotateZ(const unsigned int angle) {
 
 void Matrix3::applyMatrix(const Matrix3& matrix, const Vector3i& in, Vector3i& out)
 {
-      out.x = (matrix.m[0][0] * in.x +
-             matrix.m[1][0] * in.y +
-             matrix.m[2][0] * in.z) >> PSHIFT;
-      
-      out.y = (matrix.m[0][1] * in.x +
-             matrix.m[1][1] * in.y +
-             matrix.m[2][1] * in.z) >> PSHIFT;
-            
-      out.z = (matrix.m[0][2] * in.x +
-             matrix.m[1][2] * in.y +
-             matrix.m[2][2] * in.z) >> PSHIFT;
-  
-}
+  out.x = (matrix.m[0][0] * in.x +
+           matrix.m[1][0] * in.y +
+           matrix.m[2][0] * in.z) >> PSHIFT;
 
+  out.y = (matrix.m[0][1] * in.x +
+           matrix.m[1][1] * in.y +
+           matrix.m[2][1] * in.z) >> PSHIFT;
+
+  out.z = (matrix.m[0][2] * in.x +
+           matrix.m[1][2] * in.y +
+           matrix.m[2][2] * in.z) >> PSHIFT;
+
+}

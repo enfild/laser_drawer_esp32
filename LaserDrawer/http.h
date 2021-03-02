@@ -12,14 +12,14 @@ void handleRoot() {
   int hr = min / 60;
 
 
-  laser.getOptions(kpps,ltd,lq);
-  
+  laser.getOptions(kpps, ltd, lq);
+
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.sendHeader("Content-Type","text/html",true);
+  server.sendHeader("Content-Type", "text/html", true);
   server.send(200);
 
   sprintf ( temp,
-  "<html>\
+            "<html>\
   <head>\
     <title>Laser</title>\
     <style>\
@@ -31,69 +31,69 @@ void handleRoot() {
     <h1>Laser</h1>\
     <p>Uptime: %02d:%02d:%02d</p>\
     <p>%s %s %s</p>",
-    hr, min % 60, sec % 60,
-    fileName, __DATE__, __TIME__
-  );
+            hr, min % 60, sec % 60,
+            fileName, __DATE__, __TIME__
+          );
   server.sendContent ( temp );
 
-//-------------------
+  //-------------------
   sprintf ( temp,
-  "<form><table style='float: left' border='1' cellpadding='5'>\
+            "<form><table style='float: left' border='1' cellpadding='5'>\
   <tr><th>Object</th></tr>\
   <tr><td><table border='0' cellpadding='5'>");
   server.sendContent ( temp );
 
-  for ( int i=1; i<=objectCount; i++) {
+  for ( int i = 1; i <= objectCount; i++) {
     sprintf ( temp,
-    "<tr><td><button style='width:100px' onclick='location.href=\"/select?obj=%d\"; return false;'>%s</button></td></tr>",
-    i, objectName[i]);
+              "<tr><td><button style='width:100px' onclick='location.href=\"/select?obj=%d\"; return false;'>%s</button></td></tr>",
+              i, objectName[i]);
     server.sendContent( temp );
   }
 
   sprintf ( temp,
-  "</table></td></tr>\
+            "</table></td></tr>\
   <tr><td cellpadding=10><button style='width:100px' type='submit' formaction='/select?obj=0'>Stop</button></td></tr>\
   </table></form>");
   server.sendContent( temp );
-//-------------------
+  //-------------------
 
   sprintf ( temp,
-  "<form><table style='float: left' border='1' cellpadding='5'>\
+            "<form><table style='float: left' border='1' cellpadding='5'>\
   <tr><th>Generator</th></tr>\
   <tr><td><table border='0' cellpadding='5'>");
   server.sendContent ( temp );
 
-  for ( int i=1; i<=genCount; i++) {
+  for ( int i = 1; i <= genCount; i++) {
     sprintf ( temp,
-    "<tr><td><button style='width:100px' onclick='location.href=\"/select?gen=%d\"; return false;'>%s</button></td></tr>",
-    i, genName[i]);
+              "<tr><td><button style='width:100px' onclick='location.href=\"/select?gen=%d\"; return false;'>%s</button></td></tr>",
+              i, genName[i]);
     server.sendContent( temp );
   }
 
   sprintf ( temp,
-  "</table></td></tr>\
+            "</table></td></tr>\
   <tr><td cellpadding=10><button style='width:100px' type='submit' formaction='/select?gen=0'>Stop</button></td></tr>\
   </table></form>");
   server.sendContent( temp );
-//-------------------
+  //-------------------
 
   sprintf ( temp,
-  "<form action='/config'><table style='float: left' border='1' cellpadding='5'>\
+            "<form action='/config'><table style='float: left' border='1' cellpadding='5'>\
   <tr><th>Config</th></tr>\
   <tr><td cellpadding='10'>KPPS<br><input type=number style='width:100px' name='kpps' value='%d'><br>\
           LTD<br><input type=number style='width:100px' name='ltd' value='%d'><br>\
           LQ<br><input type=number style='width:100px' name='lq' value='%d'><br>\
   </td></tr>",
-  kpps, ltd, lq);
+            kpps, ltd, lq);
   server.sendContent( temp );
 
   sprintf ( temp,
-  "<tr><td><input type='submit' style='width:100px' value='Submit'></td></tr>\
+            "<tr><td><input type='submit' style='width:100px' value='Submit'></td></tr>\
   </table></form>");
   server.sendContent( temp );
-//-------------------
+  //-------------------
 
-  
+
 
   sprintf ( temp, "</body></html>" );
   server.sendContent ( temp );
@@ -111,7 +111,7 @@ void objectSelect() {
 
   inObj = server.arg("gen");
   genIndex = inObj.toInt();
-  
+
   // 204: No Content
   //      The server successfully processed the request and is not returning any content
   server.send ( 204, "text/plain", "");
@@ -127,12 +127,12 @@ void serverConfig() {
 
   inObj = server.arg("ltd");
   ltd = inObj.toInt();
-  
+
   inObj = server.arg("lq");
   lq = inObj.toInt();
 
   laser.setOptions(kpps, ltd, lq);
-  
+
   // 204: No Content
   //      The server successfully processed the request and is not returning any content
   server.send ( 204, "text/plain", "");
@@ -167,5 +167,5 @@ void httpSetup() {
   server.onNotFound ( handleNotFound );
   server.begin();
 
- Serial.println("http started");
+  Serial.println("http started");
 }

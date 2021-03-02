@@ -17,11 +17,9 @@ int genIndex = 0;
 
 #include "Drawing.h"
 #include "Laser.h"
-
-#include <Time.h>
-
+#include "esp32-hal-cpu.h"
 // Create laser instance (with laser pointer connected to digital pin 4)
-Laser laser(4);
+Laser laser(32);
 
 #include "http.h"
 
@@ -52,7 +50,7 @@ void genAlphabet(int init) {
     genAddress[genCount] = genAlphabet;
     genName[genCount] = "Alphabet";
   } else {
-    laser.setScale(0.4);
+    laser.setScale(1);
     Drawing::drawString(String("abcdefghijklm"), 500, 3500, 1);
     Drawing::drawString(String("nopqrstuvwxyz"), 500, 1000, 1);
   }
@@ -63,6 +61,7 @@ void genAlphabet(int init) {
 //--------------------------------------------
 void setup()
 {
+  //  setCpuFrequencyMhz(80);
   // initialize object array
   barney10();
   gear1();
@@ -82,7 +81,7 @@ void setup()
   laser.setOffset(0, 0);
 
   Serial.begin(115200);
-  
+
   laserPoints = 0;
 
   wifiSetup();
